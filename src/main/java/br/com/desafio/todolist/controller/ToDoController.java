@@ -2,6 +2,10 @@ package br.com.desafio.todolist.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +21,7 @@ import br.com.desafio.todolist.service.ToDoService;
 @RestController
 @RequestMapping("/todos")
 public class ToDoController {
-    
+
     private ToDoService toDoService;
 
     // Injeta o serviço ToDoService no controlador ToDoController
@@ -25,27 +29,28 @@ public class ToDoController {
         this.toDoService = toDoService;
     }
 
-     // Método para criar uma nova tarefa
+    // Endpoint para criar uma nova tarefa
     @PostMapping
-    List<ToDo> create(@RequestBody ToDo todo){
-        return toDoService.create(todo);
+    ResponseEntity<List<ToDo>> create(@Valid @RequestBody ToDo todo) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(toDoService.create(todo));
     }
 
-    // Método para listar todas as tarefas
+    // Endpoint para obter a lista de todas as tarefas
     @GetMapping
-    List<ToDo> list(){
+    List<ToDo> list() {
         return toDoService.list();
     }
 
-    // Método para atualizar uma tarefa existente
-    @PutMapping
-    List<ToDo> update(@RequestBody ToDo todo){
-        return toDoService.update(todo);
+    // Endpoint para atualizar uma tarefa existente
+    @PutMapping("{id}")
+    List<ToDo> update(@PathVariable Long id, @RequestBody ToDo todo) {
+        return toDoService.update(id, todo);
     }
 
-    // Método para excluir uma tarefa com base no ID
+    // Endpoint para excluir uma tarefa existente
     @DeleteMapping("{id}")
-    List<ToDo> delete(@PathVariable("id") Long id){
+    List<ToDo> delete(@PathVariable Long id) {
         return toDoService.delete(id);
     }
 }

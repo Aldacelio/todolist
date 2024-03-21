@@ -5,41 +5,68 @@ import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import br.com.desafio.todolist.exception.BadRequestException;
 import br.com.desafio.todolist.model.ToDo;
 import br.com.desafio.todolist.repository.ToDoRepository;
 
-@Service // Indicando que esta classe é um componente de serviço
+@Service // Indica que esta classe é um componente de serviço gerenciado pelo Spring
 public class ToDoService {
 
     private ToDoRepository toDoRepository;
 
+    // Construtor que injeta a dependência do ToDoRepository
     public ToDoService(ToDoRepository toDoRepository) {
+
         this.toDoRepository = toDoRepository;
+    
     }
 
-    // Criando tarefa
+    // Método para criar uma nova tarefa
     public List<ToDo> create(ToDo todo) {
-        toDoRepository.save(todo); 
-        return list(); // Chamando o metodo list para listar todas as tarefas
+
+        toDoRepository.save(todo);// Salva a nova tarefa no banco de dados
+        return list(); // Retorna a lista atualizada de tarefas
+
     }
- 
-    // Listando de forma ordenada todas as tarefas
+
+    // Método para listar todas as tarefas de forma ordenada
     public List<ToDo> list() {
+
+        // Cria um objeto Sort para definir a ordem de classificação
         Sort sort = Sort.by("vencimento").descending().and(
-            Sort.by("titulo").ascending()
-        ); // Criando objeto de ordenação.
-        return toDoRepository.findAll(sort); 
+                Sort.by("titulo").ascending()); // Criando objeto de ordenação.
+
+        return toDoRepository.findAll(sort); // Retorna todas as tarefas ordenadas
+
     }
 
-    // Atualizando uma tarefa
-    public List<ToDo> update(ToDo todo) {
-        toDoRepository.save(todo); 
-        return list(); // Chamando o metodo list para listar todas as tarefas
+    // Método para atualizar uma tarefa existente
+    public List<ToDo> update(Long id, ToDo todo) {
+        
+        // Verifica se a tarefa existe pelo ID
+        toDoRepository.findById(id).ifPresentOrElse((existingTodo) -> {
+            todo.setId(id); // Define o ID da nova tarefa
+            toDoRepository.save(todo); // Atualiza a tarefa no banco de dados
+        }, () -> {
+            // Caso a tarefa não exista, lança uma BadRequestException
+            throw new BadRequestException("Todo %d não existe! ".formatted(id));
+        });
+
+        return list(); // Retorna a lista atualizada de tarefas
+
     }
 
-    // Deletando uma tarefa
+    // Método para excluir uma tarefa existente
     public List<ToDo> delete(Long id) {
-        toDoRepository.deleteById(id);
-        return list(); // Chamando o metodo list para listar todas as tarefas
+
+        // Verifica se a tarefa existe pelo ID
+        toDoRepository.findById(id).ifPresentOrElse((existingTodo) -> toDoRepository.delete(existingTodo), () -> {
+            // Caso a tarefa não exista, lança uma BadRequestException
+            throw new BadRequestException("Todo %d não existe! ".formatted(id));
+        });
+
+        return list(); // Caso a tarefa não exista, lança uma BadRequestException
+
     }
+    
 }

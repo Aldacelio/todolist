@@ -2,25 +2,58 @@ package br.com.desafio.todolist.model;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Entity // Notação do JPA para indicar que isto é uma entidade
-@Table(name = "todos") // Notação do JPA para definir o nome da tabela
+@Entity // Indica que esta classe é uma entidade JPA
+@Table(name = "todos") // Define o nome da tabela no banco de dados
 public class ToDo {
 
-    @Id // Indicando que este é nosso id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Gerando uma estratégia para que o ID seja gerado de forma
-                                                        // sequencial e automatico
+    @Id // Indica que este é o campo de identificação da entidade
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Define a estratégia de geração automática do ID
     private long id;
-    private String titulo;
-    private String descricao;
-    private LocalDate vencimento;
-    private Boolean realizado;
 
+    @NotBlank // Garante que o campo não pode estar vazio ou conter apenas espaços em branco
+    private String titulo;
+
+    @NotBlank // Garante que o campo não pode estar vazio ou conter apenas espaços em branco
+    private String descricao;
+
+    @NotNull // Garante que o campo não pode ser nulo
+    @DateTimeFormat(pattern = "dd/MM/yyyy") // Define o formato da data
+    @Temporal(TemporalType.DATE) // Define o tipo de temporalidade para a data
+    private LocalDate vencimento;
+
+    // Construtor padrão
+    public ToDo() {
+
+    }
+
+    // Construtor com todos os campos
+    public ToDo(Long id, @NotBlank String titulo, @NotBlank String descricao, @NotNull LocalDate vencimento) {
+        this.id = id;
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.vencimento = vencimento;
+    }
+
+    // Construtor sem o campo id
+    public ToDo(String titulo, String descricao, LocalDate vencimento) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.vencimento = vencimento;
+    }
+
+    // Getters e Setters para os campos
     public long getId() {
         return id;
     }
@@ -51,14 +84,6 @@ public class ToDo {
 
     public void setVencimento(LocalDate vencimento) {
         this.vencimento = vencimento;
-    }
-
-    public Boolean getRealizado() {
-        return realizado;
-    }
-
-    public void setRealizado(Boolean realizado) {
-        this.realizado = realizado;
     }
 
 }
