@@ -68,7 +68,7 @@ $ http GET :8080/todos
 
 - Atualizar Tarefa
 ```
-$ http PUT :8080/todos/1 titulo="Todo 1 Up" descricao="Desc Todo 1 Up" vencimento="2023-07-15"
+$ http PUT :8080/todos/1 titulo="Todo 1 Up" descricao="Desc Todo 1 Up" vencimento="2024-07-15"
 
 [
   {
